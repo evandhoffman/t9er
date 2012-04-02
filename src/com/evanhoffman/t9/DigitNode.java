@@ -1,5 +1,6 @@
 package com.evanhoffman.t9;
 
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,16 +82,66 @@ public class DigitNode {
 
 	@Override
 	public String toString() {
+//		StringBuilder sb = new StringBuilder();
+//		for (Integer i : prefixDigits) {
+//			sb.append(i);
+//		}
+//		return 
+//		"{"+sb+digit+
+//		"=>"+wordList+
+//		", subNodes="+subNodes.values() +
+//		"}";
+		return getSerialized();
+	}
+	
+	public String getSerialized() {
 		StringBuilder sb = new StringBuilder();
 		for (Integer i : prefixDigits) {
 			sb.append(i);
 		}
-		return 
-		"{"+sb+digit+
-		"=>"+wordList+
-		", subNodes="+subNodes.values() +
-		//		", hashCode="+hashCode()+
-		"}";
+		
+		StringBuilder wl = new StringBuilder();
+		int i = 0;
+		for (String word : wordList.keySet()) { 
+			wl.append(word);
+			wl.append("=");
+			wl.append(wordList.get(word));
+			if (++i < wordList.size()) {
+				wl.append("&");
+			}
+		}
+		i = 0;
+		StringBuilder sn = new StringBuilder();
+		for (Integer d : subNodes.keySet()) {
+			sn.append(subNodes.get(d));
+			if (++i < subNodes.size()) {
+				sn.append("\t");
+			}
+		}
+		return "{"+sb+digit+"|"+wl+"|"+sn+"}";
+	}
+	
+	public void printCollisions(PrintWriter writer) {
+		StringBuilder sb = new StringBuilder();
+		for (Integer i : prefixDigits) {
+			sb.append(i);
+		}
+		sb.append(digit);
+		
+		if (wordList.size() > 1) {
+			int i = 0;
+			StringBuilder words = new StringBuilder();
+			for (String s : wordList.keySet()) {
+				words.append(s);
+				if (++i < wordList.size()) {
+					words.append(",");
+				}
+			}
+			writer.println(sb + "="+words);
+		}
+		for (DigitNode dn : subNodes.values()) {
+			dn.printCollisions(writer);
+		}
 	}
 
 	private static Map<Character,Integer> letterMap = new HashMap<Character,Integer>();

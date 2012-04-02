@@ -1,11 +1,15 @@
 package com.evanhoffman.t9;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +64,22 @@ public class T9Dictionary {
 
 	}
 	
+	public void serializeToFile(Writer writer) {
+		PrintWriter pw = new PrintWriter(new BufferedWriter(writer));
+		for (Integer digit : dictionaryMap.keySet()) {
+			pw.println(dictionaryMap.get(digit));
+			pw.flush();
+		}
+	}
+	
+	public void printCollisions(Writer writer) {
+		PrintWriter pw = new PrintWriter(new BufferedWriter(writer));
+		for (Integer digit : dictionaryMap.keySet()) {
+			dictionaryMap.get(digit).printCollisions(pw);
+		}
+		pw.flush();
+	}
+	
 	@Override
 	public String toString() {
 		return dictionaryMap.toString();
@@ -69,13 +89,19 @@ public class T9Dictionary {
 		
 		T9Dictionary dict = new T9Dictionary();
 
+		FileWriter writer = null;
 		try {
 			dict.loadWords(args[0]);
+			writer = new FileWriter("/Users/evan/dictionary.out.txt");
+//			dict.serializeToFile(writer);
+			dict.printCollisions(writer);
+			writer.close();
 		} catch (IOException ie) {
 			throw new RuntimeException(ie);
 		}
 
-		System.out.println(dict);
+		
+		
 	}
 
 }
